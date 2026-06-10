@@ -104,7 +104,7 @@ export default function Loader({ onComplete }) {
           initial={{ scale: 0.85, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute z-10 flex items-center justify-between px-6 py-4 rounded-full bg-black text-white w-[280px] md:w-[320px] shadow-[0_12px_45px_-5px_rgba(139,92,246,0.4),0_0_20px_2px_rgba(168,85,247,0.15)] border border-purple-500/20 pointer-events-auto"
+          className="absolute z-10 mt-24 md:mt-0 flex items-center justify-between px-6 py-4 rounded-full bg-black text-white w-[280px] md:w-[320px] shadow-[0_12px_45px_-5px_rgba(139,92,246,0.4),0_0_20px_2px_rgba(168,85,247,0.15)] border border-purple-500/20 pointer-events-auto"
         >
           <span className="text-[10px] md:text-xs font-semibold tracking-[0.2em] text-gray-400">
             LOADING
