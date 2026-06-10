@@ -63,10 +63,10 @@ export default function Loader({ onComplete }) {
                 className="w-[2px] bg-[#1c1c1f] rounded-full"
                 animate={{
                   height: i === 0 ? [4, 16, 8, 12, 4] :
-                          i === 1 ? [8, 20, 12, 16, 8] :
-                          i === 2 ? [12, 8, 20, 10, 12] :
-                          i === 3 ? [6, 14, 8, 18, 6] :
-                                    [10, 6, 12, 8, 10]
+                    i === 1 ? [8, 20, 12, 16, 8] :
+                      i === 2 ? [12, 8, 20, 10, 12] :
+                        i === 3 ? [6, 14, 8, 18, 6] :
+                          [10, 6, 12, 8, 10]
                 }}
                 transition={{
                   duration: 1.2,
