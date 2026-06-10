@@ -153,7 +153,7 @@ export default function Home() {
 
         <div className="mb-16 text-center">
           <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-2">My Work</h2>
-          <h3 className="text-3xl md:text-4xl font-extrabold text-white"> Future Projects</h3>
+          <h3 className="text-3xl md:text-4xl font-extrabold text-white"> FAKE Projects</h3>
         </div>
 
         {/* Projects Grid */}
@@ -210,7 +210,7 @@ export default function Home() {
                     className="text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-medium"
                   >
                     <FaGithub className="text-sm" />
-                    Code
+                    FUTURE
                   </a>
                   <a
                     href={project.live}
@@ -219,7 +219,7 @@ export default function Home() {
                     className="text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-medium"
                   >
                     <FaArrowUpRightFromSquare className="text-xs" />
-                    Live Demo
+                     Demo project 
                   </a>
                 </div>
               </div>
