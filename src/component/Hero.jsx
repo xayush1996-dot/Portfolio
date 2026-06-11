@@ -100,9 +100,9 @@ export default function Hero() {
         <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-[#0a0a0c] to-transparent z-20 pointer-events-none" />
 
-        <div className="flex w-[200%] gap-12 items-center animate-marquee">
+        <div className="flex w-max gap-0 items-center animate-marquee">
           {/* First loop of tech items */}
-          <div className="flex justify-around items-center w-1/2 gap-12">
+          <div className="flex shrink-0 items-center gap-12 pr-12">
             {techStack.map((tech, idx) => (
               <div key={idx} className="flex items-center gap-3 bg-[#121216]/60 border border-[#1f1f2e] px-5 py-2.5 rounded-full select-none hover:border-indigo-500/50 hover:scale-105 transition-all">
                 <span className="text-xl">{tech.icon}</span>
@@ -111,7 +111,7 @@ export default function Hero() {
             ))}
           </div>
           {/* Second identical loop of tech items for seamless looping */}
-          <div className="flex justify-around items-center w-1/2 gap-12">
+          <div className="flex shrink-0 items-center gap-12 pr-12">
             {techStack.map((tech, idx) => (
               <div key={`dup-${idx}`} className="flex items-center gap-3 bg-[#121216]/60 border border-[#1f1f2e] px-5 py-2.5 rounded-full select-none hover:border-indigo-500/50 hover:scale-105 transition-all">
                 <span className="text-xl">{tech.icon}</span>
