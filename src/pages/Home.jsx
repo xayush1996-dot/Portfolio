@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGithub, FaArrowUpRightFromSquare, FaPaperPlane, FaXmark } from 'react-icons/fa6';
 import Hero from '../component/Hero.jsx';
+import AboutCard from '../component/AboutCard.jsx';
 
 const projects = [
   {
@@ -77,44 +78,7 @@ export default function Home() {
         >
           {/* Left Column: Visual card */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-[360px] aspect-[4/5] rounded-3xl overflow-hidden border border-[#1f1f2e] bg-gradient-to-br from-[#121216]/80 to-[#0a0a0c]/60 p-6 flex flex-col justify-between shadow-2xl group hover:border-indigo-500/30 transition-colors">
-              <div className="absolute top-0 right-0 w-[150px] h-[150px] bg-indigo-500/10 rounded-full blur-[50px] group-hover:bg-indigo-500/20 transition-all pointer-events-none" />
-
-              <div className="z-10">
-                <span className="text-xs font-semibold tracking-wider text-indigo-400 uppercase">Interactive Developer</span>
-                <h3 className="text-3xl font-bold text-white mt-2">Ayush</h3>
-              </div>
-
-              {/* Photo Container */}
-              <div className="my-auto flex justify-center items-center z-10">
-                <button
-                  onClick={() => setIsPhotoModalOpen(true)}
-                  className="relative w-44 h-44 rounded-2xl overflow-hidden border border-[#1f1f2e] bg-[#0a0a0c]/40 hover:border-indigo-500/50 hover:scale-[1.05] transition-all duration-500 shadow-xl flex items-center justify-center cursor-zoom-in group/photo focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-                >
-                  <img
-                    src="/my-photo.jpeg"
-                    alt="Ayush"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover/photo:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-[#0a0a0c]/10 hover:bg-transparent transition-colors duration-300" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0c]/40 via-transparent to-transparent opacity-60 pointer-events-none" />
-                </button>
-              </div>
-
-              <div className="z-10 space-y-4">
-                <div className="w-12 h-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full" />
-                <p className="text-sm text-gray-400 leading-relaxed font-light">
-                  Focused on crafting beautiful user interfaces that combine cutting-edge technology with aesthetic simplicity.
-                </p>
-                <div className="flex gap-3 text-xs text-indigo-300 font-semibold uppercase tracking-wider">
-                  <span>Code</span>
-                  <span>•</span>
-                  <span>Design</span>
-                  <span>•</span>
-                  <span>Animate</span>
-                </div>
-              </div>
-            </div>
+            <AboutCard onPhotoClick={() => setIsPhotoModalOpen(true)} />
           </div>
 
           {/* Right Column: Text content */}
