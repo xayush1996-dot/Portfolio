@@ -39,8 +39,11 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between relative">
           {/* Logo */}
-          <a href="#home" className="text-xl md:text-2xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500 hover:opacity-85 transition-opacity z-10">
-            AYUSH
+          <a href="#home" className="flex items-center gap-2.5 z-10 hover:opacity-85 transition-opacity">
+            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
+            <span className="text-xl md:text-2xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">
+              AYUSH
+            </span>
           </a>
 
           {/* Center Email Address */}

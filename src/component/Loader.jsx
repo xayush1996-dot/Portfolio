@@ -50,9 +50,12 @@ export default function Loader({ onComplete }) {
       {/* Top Header Section */}
       <div className="w-full flex justify-between items-center z-10">
         {/* Brand/Logo (Left) */}
-        <span className="font-extrabold tracking-[0.15em] text-xs md:text-sm">
-          AYUSH
-        </span>
+        <div className="flex items-center gap-2">
+          <img src="/logo.png" alt="Logo" className="w-6 h-6 object-contain" />
+          <span className="font-extrabold tracking-[0.15em] text-xs md:text-sm">
+            AYUSH
+          </span>
+        </div>
 
         {/* Sound Waves & Accent Dot (Right) */}
         <div className="flex flex-col items-center gap-[5px] pr-2">
