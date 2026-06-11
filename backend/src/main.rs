@@ -1,15 +1,10 @@
-use axum::{
-    extract::State,
-    http::{HeaderMap, Method, StatusCode},
-    response::IntoResponse,
-    routing::{get, post},
-    Json, Router,
+use actix_cors::Cors;
+use actix_web::{
+    get, post, web, App, HttpResponse, HttpServer, Responder
 };
 use serde::{Deserialize, Serialize};
 use sqlx::{sqlite::SqliteConnectOptions, SqlitePool};
-use std::net::SocketAddr;
 use std::str::FromStr;
-use tower_http::cors::{Any, CorsLayer};
 
 #[derive(Deserialize, Serialize, Debug)]
 struct ContactForm {
@@ -33,7 +28,7 @@ struct Contact {
     created_at: Option<String>,
 }
 
-#[tokio::main]
+#[actix_web::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Load environment variables from .env file if present
     let _ = dotenvy::dotenv();
@@ -73,45 +68,43 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Database initialized and migrated.");
 
-    // Configure CORS
-    let cors = CorsLayer::new()
-        .allow_origin(Any) // In a real app, restrict this to your frontend domain
-        .allow_methods([Method::GET, Method::POST])
-        .allow_headers(Any);
+    // Start HttpServer
+    HttpServer::new(move || {
+        // Configure CORS
+        let cors = Cors::default()
+            .allow_any_origin()
+            .allowed_methods(vec!["GET", "POST"])
+            .allow_any_header()
+            .max_age(3600);
 
-    // Build routes
-    let app = Router::new()
-        .route("/api/contact", post(submit_contact))
-        .route("/api/contacts", get(get_contacts))
-        .layer(cors)
-        .with_state(pool);
-
-    // Run the server
-    let addr = SocketAddr::from(([0, 0, 0, 0], port));
-    let listener = tokio::net::TcpListener::bind(&addr).await?;
-    println!("Listening on {}", addr);
-    axum::serve(listener, app).await?;
+        App::new()
+            .wrap(cors)
+            .app_data(web::Data::new(pool.clone()))
+            .service(submit_contact)
+            .service(get_contacts)
+    })
+    .bind(("0.0.0.0", port))?
+    .run()
+    .await?;
 
     Ok(())
 }
 
+#[post("/api/contact")]
 async fn submit_contact(
-    State(pool): State<SqlitePool>,
-    Json(payload): Json<ContactForm>,
-) -> impl IntoResponse {
+    pool: web::Data<SqlitePool>,
+    payload: web::Json<ContactForm>,
+) -> impl Responder {
     println!("Received contact form submission: {:?}", payload);
 
     if payload.name.trim().is_empty()
         || payload.email.trim().is_empty()
         || payload.message.trim().is_empty()
     {
-        return (
-            StatusCode::BAD_REQUEST,
-            Json(ApiResponse {
-                success: false,
-                message: "All fields are required and cannot be empty".to_string(),
-            }),
-        );
+        return HttpResponse::BadRequest().json(ApiResponse {
+            success: false,
+            message: "All fields are required and cannot be empty".to_string(),
+        });
     }
 
     // Insert contact message into SQLite database
@@ -121,36 +114,32 @@ async fn submit_contact(
     .bind(&payload.name)
     .bind(&payload.email)
     .bind(&payload.message)
-    .execute(&pool)
+    .execute(pool.get_ref())
     .await;
 
     match result {
-        Ok(_) => (
-            StatusCode::CREATED,
-            Json(ApiResponse {
-                success: true,
-                message: "Your message has been saved successfully!".to_string(),
-            }),
-        ),
+        Ok(_) => HttpResponse::Created().json(ApiResponse {
+            success: true,
+            message: "Your message has been saved successfully!".to_string(),
+        }),
         Err(err) => {
             eprintln!("Database error saving contact submission: {:?}", err);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(ApiResponse {
-                    success: false,
-                    message: "Internal server error saving message".to_string(),
-                }),
-            )
+            HttpResponse::InternalServerError().json(ApiResponse {
+                success: false,
+                message: "Internal server error saving message".to_string(),
+            })
         }
     }
 }
 
+#[get("/api/contacts")]
 async fn get_contacts(
-    State(pool): State<SqlitePool>,
-    headers: HeaderMap,
-) -> impl IntoResponse {
+    pool: web::Data<SqlitePool>,
+    req: actix_web::HttpRequest,
+) -> impl Responder {
     let admin_key = std::env::var("ADMIN_API_KEY").unwrap_or_else(|_| "admin_secret_123".to_string());
 
+    let headers = req.headers();
     let auth_valid = headers
         .get("Authorization")
         .and_then(|value| value.to_str().ok())
@@ -158,38 +147,29 @@ async fn get_contacts(
         .unwrap_or(false);
 
     if !auth_valid {
-        return (
-            StatusCode::UNAUTHORIZED,
-            Json(serde_json::json!({
-                "success": false,
-                "message": "Unauthorized: Invalid or missing token"
-            })),
-        ).into_response();
+        return HttpResponse::Unauthorized().json(serde_json::json!({
+            "success": false,
+            "message": "Unauthorized: Invalid or missing token"
+        }));
     }
 
     let result = sqlx::query_as::<_, Contact>(
         "SELECT id, name, email, message, strftime('%Y-%m-%d %H:%M:%S', created_at) as created_at FROM contacts ORDER BY created_at DESC"
     )
-    .fetch_all(&pool)
+    .fetch_all(pool.get_ref())
     .await;
 
     match result {
-        Ok(contacts) => (
-            StatusCode::OK,
-            Json(serde_json::json!({
-                "success": true,
-                "contacts": contacts
-            })),
-        ).into_response(),
+        Ok(contacts) => HttpResponse::Ok().json(serde_json::json!({
+            "success": true,
+            "contacts": contacts
+        })),
         Err(err) => {
             eprintln!("Database error fetching contacts: {:?}", err);
-            (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(serde_json::json!({
-                    "success": false,
-                    "message": "Internal server error fetching contacts"
-                })),
-            ).into_response()
+            HttpResponse::InternalServerError().json(serde_json::json!({
+                "success": false,
+                "message": "Internal server error fetching contacts"
+            }))
         }
     }
 }
