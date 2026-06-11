@@ -46,15 +46,41 @@ export default function Home() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.name && formData.email && formData.message) {
-      setFormSubmitted(true);
-      setTimeout(() => {
-        setFormSubmitted(false);
+    if (!formData.name || !formData.email || !formData.message) return;
+
+    setIsLoading(true);
+    setSubmitError(null);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setFormSubmitted(true);
         setFormData({ name: '', email: '', message: '' });
-      }, 3000);
+        setTimeout(() => {
+          setFormSubmitted(false);
+        }, 5000);
+      } else {
+        setSubmitError(data.message || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setSubmitError('Failed to connect to the server. Please verify the backend is running.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -199,7 +225,7 @@ export default function Home() {
 
         <div className="mb-16 text-center">
           <h2 className="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-2">Get In Touch</h2>
-          <h3 className="text-3xl md:text-4xl font-extrabold text-white">Let's Create Something Great ? Feature not added , Do Email </h3>
+          <h3 className="text-3xl md:text-4xl font-extrabold text-white">Let's Create Something Great</h3>
         </div>
 
         {/* Contact Form */}
@@ -265,11 +291,18 @@ export default function Home() {
                 />
               </div>
 
+              {submitError && (
+                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+                  ⚠️ {submitError}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 group shadow-lg shadow-indigo-500/10"
+                disabled={isLoading}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2 group shadow-lg shadow-indigo-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Send Message
+                {isLoading ? 'Sending...' : 'Send Message'}
                 <FaPaperPlane className="text-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </button>
             </form>
