@@ -1,8 +1,8 @@
 use axum::{
     extract::State,
-    http::{StatusCode, Method},
+    http::{HeaderMap, Method, StatusCode},
     response::IntoResponse,
-    routing::post,
+    routing::{get, post},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
@@ -22,6 +22,15 @@ struct ContactForm {
 struct ApiResponse {
     success: bool,
     message: String,
+}
+
+#[derive(Serialize, sqlx::FromRow)]
+struct Contact {
+    id: i64,
+    name: String,
+    email: String,
+    message: String,
+    created_at: Option<String>,
 }
 
 #[tokio::main]
@@ -67,12 +76,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Configure CORS
     let cors = CorsLayer::new()
         .allow_origin(Any) // In a real app, restrict this to your frontend domain
-        .allow_methods([Method::POST])
+        .allow_methods([Method::GET, Method::POST])
         .allow_headers(Any);
 
     // Build routes
     let app = Router::new()
         .route("/api/contact", post(submit_contact))
+        .route("/api/contacts", get(get_contacts))
         .layer(cors)
         .with_state(pool);
 
@@ -131,6 +141,55 @@ async fn submit_contact(
                     message: "Internal server error saving message".to_string(),
                 }),
             )
+        }
+    }
+}
+
+async fn get_contacts(
+    State(pool): State<SqlitePool>,
+    headers: HeaderMap,
+) -> impl IntoResponse {
+    let admin_key = std::env::var("ADMIN_API_KEY").unwrap_or_else(|_| "admin_secret_123".to_string());
+
+    let auth_valid = headers
+        .get("Authorization")
+        .and_then(|value| value.to_str().ok())
+        .map(|token| token.trim_start_matches("Bearer ").trim() == admin_key)
+        .unwrap_or(false);
+
+    if !auth_valid {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(serde_json::json!({
+                "success": false,
+                "message": "Unauthorized: Invalid or missing token"
+            })),
+        ).into_response();
+    }
+
+    let result = sqlx::query_as::<_, Contact>(
+        "SELECT id, name, email, message, strftime('%Y-%m-%d %H:%M:%S', created_at) as created_at FROM contacts ORDER BY created_at DESC"
+    )
+    .fetch_all(&pool)
+    .await;
+
+    match result {
+        Ok(contacts) => (
+            StatusCode::OK,
+            Json(serde_json::json!({
+                "success": true,
+                "contacts": contacts
+            })),
+        ).into_response(),
+        Err(err) => {
+            eprintln!("Database error fetching contacts: {:?}", err);
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(serde_json::json!({
+                    "success": false,
+                    "message": "Internal server error fetching contacts"
+                })),
+            ).into_response()
         }
     }
 }
