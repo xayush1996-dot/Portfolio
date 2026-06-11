@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { FaGithub, FaLinkedinIn, FaTwitter, FaEnvelope } from 'react-icons/fa6';
 
-const socials = [
+export const socials = [
   { icon: <FaGithub />, href: 'https://github.com/xayush1996-dot', label: 'GitHub' },
   { icon: <FaLinkedinIn />, href: 'https://www.linkedin.com/in/ayush-singh-99a61837a/', label: 'LinkedIn' },
   { icon: <FaTwitter />, href: 'https://x.com/ayush77781', label: 'Twitter' },

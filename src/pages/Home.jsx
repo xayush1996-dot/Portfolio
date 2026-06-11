@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaGithub, FaArrowUpRightFromSquare, FaPaperPlane, FaXmark } from 'react-icons/fa6';
 import Hero from '../component/Hero.jsx';
 import AboutCard from '../component/AboutCard.jsx';
+import { socials } from '../component/Socials.jsx';
 
 const projects = [
   {
@@ -277,9 +278,28 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-[#1f1f2e] text-center text-xs text-gray-600 font-light">
-        <p>&copy; {new Date().getFullYear()} Ayush. All rights reserved. </p>
-        <p className="mt-2 text-[10px] text-gray-700">Built with React, Vite, Tailwind CSS, and Framer Motion.</p>
+      <footer className="py-12 border-t border-[#1f1f2e] text-center text-xs text-gray-600 font-light flex flex-col items-center justify-center gap-4">
+        {/* Social Links for mobile/tablet screens */}
+        <div className="flex lg:hidden items-center gap-4 mb-2">
+          {socials.map((social, idx) => (
+            <motion.a
+              key={idx}
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={social.label}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-9 h-9 rounded-full bg-[#121216]/80 border border-[#1f1f2e] text-gray-400 hover:text-indigo-400 hover:border-indigo-500/50 flex items-center justify-center text-base transition-all shadow-md backdrop-blur-sm"
+            >
+              {social.icon}
+            </motion.a>
+          ))}
+        </div>
+        <div>
+          <p>&copy; {new Date().getFullYear()} Ayush. All rights reserved. </p>
+          <p className="mt-2 text-[10px] text-gray-700">Built with React, Vite, Tailwind CSS, and Framer Motion.</p>
+        </div>
       </footer>
 
       {/* Photo Lightbox Popup */}

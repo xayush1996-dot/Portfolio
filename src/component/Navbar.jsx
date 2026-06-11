@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiMenuAlt3, HiX } from 'react-icons/hi';
+import { socials } from './Socials.jsx';
 
 const navLinks = [
   { name: 'Home', href: '#home' },
@@ -118,6 +119,23 @@ export default function Navbar() {
               >
                 Get in Touch
               </a>
+
+              {/* Mobile Social Links */}
+              <div className="flex items-center justify-center gap-6 pt-6 border-t border-[#1f1f2e]">
+                {socials.map((social, idx) => (
+                  <motion.a
+                    key={idx}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-10 h-10 rounded-full bg-[#121216]/80 border border-[#1f1f2e] text-gray-400 hover:text-indigo-400 hover:border-indigo-500/50 flex items-center justify-center text-lg transition-colors shadow-md backdrop-blur-sm"
+                  >
+                    {social.icon}
+                  </motion.a>
+                ))}
+              </div>
             </div>
           </motion.div>
         )}
